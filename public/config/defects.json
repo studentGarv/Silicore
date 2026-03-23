@@ -1,0 +1,29 @@
+{
+  "scenarios": [
+    {
+      "id": "scenario-1",
+      "name": "Particle Contamination",
+      "defects": [
+        {
+          "id": "defect-1",
+          "type": "particle",
+          "position": { "x": 0.3, "y": 0.4 },
+          "severity": "high",
+          "confidence": 0.95
+        },
+        {
+          "id": "defect-2",
+          "type": "particle",
+          "position": { "x": 0.7, "y": 0.2 },
+          "severity": "medium",
+          "confidence": 0.87
+        }
+      ],
+      "yieldImpact": {
+        "before": 85,
+        "after": 92,
+        "improvement": "Early detection prevented 7% yield loss"
+      }
+    }
+  ]
+}

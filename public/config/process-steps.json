@@ -1,0 +1,140 @@
+{
+  "steps": [
+    {
+      "id": "wafer-manufacturing",
+      "name": "Wafer Manufacturing",
+      "description": "Silicon ingots are sliced into thin wafers that serve as the substrate for chip fabrication.",
+      "position": { "x": 0, "y": 0, "z": 0 },
+      "modelPath": "/models/wafer-manufacturing.glb",
+      "animation": {
+        "type": "rotation",
+        "duration": 2,
+        "easing": "power2.inOut"
+      },
+      "effects": {
+        "glow": true,
+        "scanLines": false,
+        "particles": false
+      }
+    },
+    {
+      "id": "oxidation",
+      "name": "Oxidation",
+      "description": "A thin layer of silicon dioxide is grown on the wafer surface to act as an insulator.",
+      "position": { "x": 1.5, "y": 0, "z": 0 },
+      "modelPath": "/models/oxidation.glb",
+      "animation": {
+        "type": "scale",
+        "duration": 2,
+        "easing": "power2.inOut"
+      },
+      "effects": {
+        "glow": true,
+        "scanLines": false,
+        "particles": true
+      }
+    },
+    {
+      "id": "photolithography",
+      "name": "Photolithography",
+      "description": "UV light projects circuit patterns through a photomask onto the wafer surface.",
+      "position": { "x": 3, "y": 0, "z": 0 },
+      "modelPath": "/models/photolithography.glb",
+      "animation": {
+        "type": "custom",
+        "duration": 3,
+        "easing": "power2.inOut"
+      },
+      "effects": {
+        "glow": true,
+        "scanLines": true,
+        "particles": true
+      }
+    },
+    {
+      "id": "etching",
+      "name": "Etching",
+      "description": "Plasma or chemical processes remove material from unprotected areas to create circuit features.",
+      "position": { "x": 4.5, "y": 0, "z": 0 },
+      "modelPath": "/models/etching.glb",
+      "animation": {
+        "type": "rotation",
+        "duration": 2,
+        "easing": "power2.inOut"
+      },
+      "effects": {
+        "glow": true,
+        "scanLines": true,
+        "particles": true
+      }
+    },
+    {
+      "id": "deposition-implantation",
+      "name": "Deposition & Ion Implantation",
+      "description": "Materials are deposited onto the wafer and ions are implanted to modify electrical properties.",
+      "position": { "x": 6, "y": 0, "z": 0 },
+      "modelPath": "/models/deposition.glb",
+      "animation": {
+        "type": "custom",
+        "duration": 2.5,
+        "easing": "power2.inOut"
+      },
+      "effects": {
+        "glow": true,
+        "scanLines": false,
+        "particles": true
+      }
+    },
+    {
+      "id": "metal-wiring",
+      "name": "Metal Wiring",
+      "description": "Metal layers are deposited and patterned to create interconnections between transistors.",
+      "position": { "x": 7.5, "y": 0, "z": 0 },
+      "modelPath": "/models/metal-wiring.glb",
+      "animation": {
+        "type": "scale",
+        "duration": 2,
+        "easing": "power2.inOut"
+      },
+      "effects": {
+        "glow": true,
+        "scanLines": true,
+        "particles": false
+      }
+    },
+    {
+      "id": "electrical-sorting",
+      "name": "Electrical Die Sorting",
+      "description": "Each die on the wafer is tested electrically to identify functional chips.",
+      "position": { "x": 9, "y": 0, "z": 0 },
+      "modelPath": "/models/electrical-sorting.glb",
+      "animation": {
+        "type": "rotation",
+        "duration": 2,
+        "easing": "power2.inOut"
+      },
+      "effects": {
+        "glow": true,
+        "scanLines": true,
+        "particles": false
+      }
+    },
+    {
+      "id": "packaging",
+      "name": "Packaging",
+      "description": "Individual dies are cut from the wafer and packaged in protective casings with electrical connections.",
+      "position": { "x": 10.5, "y": 0, "z": 0 },
+      "modelPath": "/models/packaging.glb",
+      "animation": {
+        "type": "scale",
+        "duration": 2,
+        "easing": "power2.inOut"
+      },
+      "effects": {
+        "glow": true,
+        "scanLines": false,
+        "particles": false
+      }
+    }
+  ]
+}
