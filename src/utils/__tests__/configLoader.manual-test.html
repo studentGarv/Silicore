@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Config Loader Manual Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #e0e0e0;
+    }
+    h1 {
+      color: #00d9ff;
+    }
+    .test-section {
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .test-result {
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    .success {
+      background: #1a4d2e;
+      border-left: 4px solid #4caf50;
+    }
+    .error {
+      background: #4d1a1a;
+      border-left: 4px solid #f44336;
+    }
+    .info {
+      background: #1a3a4d;
+      border-left: 4px solid #2196f3;
+    }
+    button {
+      background: #00d9ff;
+      color: #1a1a1a;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 5px;
+    }
+    button:hover {
+      background: #00b8d4;
+    }
+    pre {
+      background: #1a1a1a;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Configuration Loader Manual Test</h1>
+  <p>This page tests the configuration loader with validation, caching, and fallback mechanisms.</p>
+
+  <div class="test-section">
+    <h2>Test 1: Load Process Steps</h2>
+    <button onclick="testProcessSteps()">Run Test</button>
+    <div id="test1-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Test 2: Load Tooltips</h2>
+    <button onclick="testTooltips()">Run Test</button>
+    <div id="test2-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Test 3: Load Defect Scenarios</h2>
+    <button onclick="testDefectScenarios()">Run Test</button>
+    <div id="test3-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Test 4: Verify Caching</h2>
+    <button onclick="testCaching()">Run Test</button>
+    <div id="test4-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Test 5: Test Fallback (Invalid URL)</h2>
+    <button onclick="testFallback()">Run Test</button>
+    <div id="test5-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>Test 6: Clear Cache</h2>
+    <button onclick="testClearCache()">Run Test</button>
+    <div id="test6-result"></div>
+  </div>
+
+  <script type="module">
+    // Note: This test file is designed to be served by Vite dev server
+    // Run: npm run dev
+    // Then navigate to this file through the dev server
+
+    import {
+      loadProcessSteps,
+      loadTooltips,
+      loadDefectScenarios,
+      clearConfigCache,
+      getConfigCacheStatus,
+    } from '../configLoader.ts';
+
+    function displayResult(elementId, success, message, data = null) {
+      const element = document.getElementById(elementId);
+      const className = success ? 'success' : 'error';
+      let html = `<div class="test-result ${className}">${message}</div>`;
+      
+      if (data) {
+        html += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+      }
+      
+      element.innerHTML = html;
+    }
+
+    window.testProcessSteps = async function() {
+      try {
+        const steps = await loadProcessSteps();
+        const success = Array.isArray(steps) && steps.length > 0;
+        displayResult(
+          'test1-result',
+          success,
+          success 
+            ? `✓ Successfully loaded ${steps.length} process steps`
+            : '✗ Failed to load process steps',
+          success ? steps : null
+        );
+      } catch (error) {
+        displayResult('test1-result', false, `✗ Error: ${error.message}`);
+      }
+    };
+
+    window.testTooltips = async function() {
+      try {
+        const tooltips = await loadTooltips();
+        const success = Array.isArray(tooltips) && tooltips.length > 0;
+        displayResult(
+          'test2-result',
+          success,
+          success 
+            ? `✓ Successfully loaded ${tooltips.length} tooltips`
+            : '✗ Failed to load tooltips',
+          success ? tooltips : null
+        );
+      } catch (error) {
+        displayResult('test2-result', false, `✗ Error: ${error.message}`);
+      }
+    };
+
+    window.testDefectScenarios = async function() {
+      try {
+        const scenarios = await loadDefectScenarios();
+        const success = Array.isArray(scenarios) && scenarios.length > 0;
+        displayResult(
+          'test3-result',
+          success,
+          success 
+            ? `✓ Successfully loaded ${scenarios.length} defect scenarios`
+            : '✗ Failed to load defect scenarios',
+          success ? scenarios : null
+        );
+      } catch (error) {
+        displayResult('test3-result', false, `✗ Error: ${error.message}`);
+      }
+    };
+
+    window.testCaching = async function() {
+      try {
+        // Clear cache first
+        clearConfigCache();
+        
+        // First load
+        const start1 = performance.now();
+        await loadProcessSteps();
+        const time1 = performance.now() - start1;
+        
+        // Second load (should be cached)
+        const start2 = performance.now();
+        await loadProcessSteps();
+        const time2 = performance.now() - start2;
+        
+        const cacheStatus = getConfigCacheStatus();
+        const isCached = time2 < time1 * 0.1; // Cached should be much faster
+        
+        displayResult(
+          'test4-result',
+          isCached,
+          isCached
+            ? `✓ Caching works! First load: ${time1.toFixed(2)}ms, Cached load: ${time2.toFixed(2)}ms`
+            : `⚠ Caching may not be working. First: ${time1.toFixed(2)}ms, Second: ${time2.toFixed(2)}ms`,
+          cacheStatus
+        );
+      } catch (error) {
+        displayResult('test4-result', false, `✗ Error: ${error.message}`);
+      }
+    };
+
+    window.testFallback = async function() {
+      try {
+        // This will test the fallback mechanism by trying to load from invalid URL
+        // We'll modify the fetch to simulate a failure
+        const originalFetch = window.fetch;
+        window.fetch = async (url) => {
+          if (url.includes('process-steps.json')) {
+            throw new Error('Simulated network error');
+          }
+          return originalFetch(url);
+        };
+        
+        clearConfigCache();
+        const steps = await loadProcessSteps();
+        
+        // Restore original fetch
+        window.fetch = originalFetch;
+        
+        const usedFallback = steps.length === 1 && steps[0].id === 'wafer-manufacturing';
+        displayResult(
+          'test5-result',
+          usedFallback,
+          usedFallback
+            ? '✓ Fallback mechanism works! Default content loaded on error'
+            : '⚠ Fallback may not have triggered',
+          steps
+        );
+      } catch (error) {
+        displayResult('test5-result', false, `✗ Error: ${error.message}`);
+      }
+    };
+
+    window.testClearCache = function() {
+      try {
+        const beforeClear = getConfigCacheStatus();
+        clearConfigCache();
+        const afterClear = getConfigCacheStatus();
+        
+        const allCleared = Object.values(afterClear).every(v => v === false);
+        
+        displayResult(
+          'test6-result',
+          allCleared,
+          allCleared
+            ? '✓ Cache cleared successfully'
+            : '⚠ Cache may not have cleared completely',
+          { beforeClear, afterClear }
+        );
+      } catch (error) {
+        displayResult('test6-result', false, `✗ Error: ${error.message}`);
+      }
+    };
+
+    // Display initial cache status
+    document.addEventListener('DOMContentLoaded', () => {
+      const status = getConfigCacheStatus();
+      console.log('Initial cache status:', status);
+    });
+  </script>
+</body>
+</html>

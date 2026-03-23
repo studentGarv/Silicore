@@ -1,6 +1,10 @@
 ﻿import { useEffect } from 'react'
+import { usePersistence } from './hooks/usePersistence'
 
 function App() {
+  // Initialize persistence on app startup
+  usePersistence();
+  
   useEffect(() => {
     document.body.classList.add('dark')
   }, [])

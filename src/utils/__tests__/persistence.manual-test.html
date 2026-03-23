@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Persistence Manual Test</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #1a1a2e;
+      color: #eee;
+    }
+    h1 { color: #00d9ff; }
+    h2 { color: #a855f7; margin-top: 30px; }
+    button {
+      background: #00d9ff;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    button:hover { background: #00b8d4; }
+    .result {
+      background: #16213e;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border-left: 3px solid #00d9ff;
+    }
+    .success { border-left-color: #4ade80; }
+    .error { border-left-color: #ef4444; }
+    pre {
+      background: #0f1419;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 Persistence Manual Test Suite</h1>
+  <p>This page tests the localStorage persistence implementation for the Semiconductor 3D Website.</p>
+
+  <h2>Test 1: Storage Availability</h2>
+  <button onclick="testStorageAvailable()">Run Test</button>
+  <div id="test1-result"></div>
+
+  <h2>Test 2: Save and Load Data</h2>
+  <button onclick="testSaveLoad()">Run Test</button>
+  <div id="test2-result"></div>
+
+  <h2>Test 3: Audio Preference Persistence</h2>
+  <button onclick="testAudioPersistence()">Toggle Audio & Save</button>
+  <button onclick="checkAudioPersistence()">Check Saved Audio State</button>
+  <div id="test3-result"></div>
+
+  <h2>Test 4: Completed Steps Persistence</h2>
+  <button onclick="testStepsPersistence()">Mark Steps Complete</button>
+  <button onclick="checkStepsPersistence()">Check Saved Steps</button>
+  <div id="test4-result"></div>
+
+  <h2>Test 5: Current Section Persistence</h2>
+  <button onclick="testSectionPersistence()">Change Section</button>
+  <button onclick="checkSectionPersistence()">Check Saved Section</button>
+  <div id="test5-result"></div>
+
+  <h2>Test 6: Error Handling</h2>
+  <button onclick="testErrorHandling()">Test Invalid JSON</button>
+  <div id="test6-result"></div>
+
+  <h2>Test 7: Clear All Data</h2>
+  <button onclick="clearAllData()">Clear All Persistence Data</button>
+  <div id="test7-result"></div>
+
+  <script type="module">
+    // Import persistence utilities
+    import {
+      loadFromStorage,
+      saveToStorage,
+      removeFromStorage,
+      isStorageAvailable,
+      clearAppStorage,
+    } from '../persistence.js';
+
+    // Make functions available globally
+    window.persistenceUtils = {
+      loadFromStorage,
+      saveToStorage,
+      removeFromStorage,
+      isStorageAvailable,
+      clearAppStorage,
+    };
+
+    window.testStorageAvailable = function() {
+      const result = document.getElementById('test1-result');
+      const available = window.persistenceUtils.isStorageAvailable();
+      
+      if (available) {
+        result.innerHTML = '<div class="result success">✅ localStorage is available and functional</div>';
+      } else {
+        result.innerHTML = '<div class="result error">❌ localStorage is NOT available</div>';
+      }
+    };
+
+    window.testSaveLoad = function() {
+      const result = document.getElementById('test2-result');
+      const testData = { name: 'test', value: 42, nested: { key: 'value' } };
+      
+      // Save
+      const saved = window.persistenceUtils.saveToStorage('test-key', testData);
+      if (!saved) {
+        result.innerHTML = '<div class="result error">❌ Failed to save data</div>';
+        return;
+      }
+      
+      // Load
+      const loaded = window.persistenceUtils.loadFromStorage('test-key');
+      if (!loaded) {
+        result.innerHTML = '<div class="result error">❌ Failed to load data</div>';
+        return;
+      }
+      
+      // Verify
+      if (JSON.stringify(loaded) === JSON.stringify(testData)) {
+        result.innerHTML = `
+          <div class="result success">
+            ✅ Data saved and loaded successfully
+            <pre>${JSON.stringify(loaded, null, 2)}</pre>
+          </div>
+        `;
+        window.persistenceUtils.removeFromStorage('test-key');
+      } else {
+        result.innerHTML = '<div class="result error">❌ Loaded data does not match</div>';
+      }
+    };
+
+    window.testAudioPersistence = function() {
+      const result = document.getElementById('test3-result');
+      const currentState = window.persistenceUtils.loadFromStorage('ui-storage');
+      const newAudioState = currentState?.state?.audioEnabled ? false : true;
+      
+      const newState = {
+        state: {
+          audioEnabled: newAudioState,
+          currentSection: currentState?.state?.currentSection || 'hero'
+        },
+        version: 0
+      };
+      
+      window.persistenceUtils.saveToStorage('ui-storage', newState);
+      result.innerHTML = `
+        <div class="result success">
+          ✅ Audio preference saved: ${newAudioState ? 'Enabled' : 'Disabled'}
+        </div>
+      `;
+    };
+
+    window.checkAudioPersistence = function() {
+      const result = document.getElementById('test3-result');
+      const state = window.persistenceUtils.loadFromStorage('ui-storage');
+      
+      if (state && state.state) {
+        result.innerHTML = `
+          <div class="result success">
+            ✅ Audio preference loaded
+            <pre>${JSON.stringify(state.state, null, 2)}</pre>
+          </div>
+        `;
+      } else {
+        result.innerHTML = '<div class="result error">❌ No audio preference found</div>';
+      }
+    };
+
+    window.testStepsPersistence = function() {
+      const result = document.getElementById('test4-result');
+      const steps = ['wafer-manufacturing', 'oxidation', 'photolithography'];
+      
+      const state = {
+        state: {
+          completedSteps: steps
+        },
+        version: 0
+      };
+      
+      window.persistenceUtils.saveToStorage('process-flow-storage', state);
+      result.innerHTML = `
+        <div class="result success">
+          ✅ Completed steps saved: ${steps.join(', ')}
+        </div>
+      `;
+    };
+
+    window.checkStepsPersistence = function() {
+      const result = document.getElementById('test4-result');
+      const state = window.persistenceUtils.loadFromStorage('process-flow-storage');
+      
+      if (state && state.state && state.state.completedSteps) {
+        result.innerHTML = `
+          <div class="result success">
+            ✅ Completed steps loaded
+            <pre>${JSON.stringify(state.state.completedSteps, null, 2)}</pre>
+          </div>
+        `;
+      } else {
+        result.innerHTML = '<div class="result error">❌ No completed steps found</div>';
+      }
+    };
+
+    window.testSectionPersistence = function() {
+      const result = document.getElementById('test5-result');
+      const sections = ['hero', 'process-flow', 'photolithography', 'wli', 'surface-map'];
+      const randomSection = sections[Math.floor(Math.random() * sections.length)];
+      
+      const currentState = window.persistenceUtils.loadFromStorage('ui-storage');
+      const newState = {
+        state: {
+          audioEnabled: currentState?.state?.audioEnabled || false,
+          currentSection: randomSection
+        },
+        version: 0
+      };
+      
+      window.persistenceUtils.saveToStorage('ui-storage', newState);
+      result.innerHTML = `
+        <div class="result success">
+          ✅ Current section saved: ${randomSection}
+        </div>
+      `;
+    };
+
+    window.checkSectionPersistence = function() {
+      const result = document.getElementById('test5-result');
+      const state = window.persistenceUtils.loadFromStorage('ui-storage');
+      
+      if (state && state.state && state.state.currentSection) {
+        result.innerHTML = `
+          <div class="result success">
+            ✅ Current section loaded: ${state.state.currentSection}
+          </div>
+        `;
+      } else {
+        result.innerHTML = '<div class="result error">❌ No current section found</div>';
+      }
+    };
+
+    window.testErrorHandling = function() {
+      const result = document.getElementById('test6-result');
+      
+      // Set invalid JSON
+      localStorage.setItem('test-invalid', '{invalid json}');
+      
+      // Try to load
+      const loaded = window.persistenceUtils.loadFromStorage('test-invalid');
+      
+      if (loaded === null) {
+        result.innerHTML = `
+          <div class="result success">
+            ✅ Invalid JSON handled gracefully (returned null)
+          </div>
+        `;
+      } else {
+        result.innerHTML = '<div class="result error">❌ Invalid JSON not handled properly</div>';
+      }
+      
+      localStorage.removeItem('test-invalid');
+    };
+
+    window.clearAllData = function() {
+      const result = document.getElementById('test7-result');
+      window.persistenceUtils.clearAppStorage('');
+      localStorage.removeItem('ui-storage');
+      localStorage.removeItem('process-flow-storage');
+      
+      result.innerHTML = `
+        <div class="result success">
+          ✅ All persistence data cleared
+        </div>
+      `;
+    };
+  </script>
+</body>
+</html>
