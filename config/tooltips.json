@@ -1,0 +1,22 @@
+{
+  "tooltips": [
+    {
+      "id": "non-contact-measurement",
+      "title": "Non-contact measurement",
+      "description": "WLI measures surface topology without physical contact",
+      "position": "top"
+    },
+    {
+      "id": "nanometer-resolution",
+      "title": "Nanometer resolution",
+      "description": "Achieves sub-nanometer vertical resolution",
+      "position": "right"
+    },
+    {
+      "id": "3d-surface-mapping",
+      "title": "3D surface mapping",
+      "description": "Creates detailed 3D height maps of wafer surfaces",
+      "position": "bottom"
+    }
+  ]
+}
