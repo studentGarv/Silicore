@@ -53,7 +53,7 @@ function NavBar() {
             <span className="text-[10px] font-black text-black">Si</span>
           </div>
           <span className="font-bold text-white tracking-tight text-sm group-hover:text-neon-cyan transition-colors">
-            SiliCore<span className="text-neon-cyan">3D</span>
+            SiliCore
           </span>
         </button>
 

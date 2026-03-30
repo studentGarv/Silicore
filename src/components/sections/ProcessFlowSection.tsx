@@ -42,11 +42,13 @@ export function ProcessFlowSection() {
     return () => observers.forEach((o) => o.disconnect());
   }, []);
 
-  // Scroll to a step's detail section
+  // Scroll to a step's detail section, offsetting for the fixed navbar (64px) + sticky strip (~90px)
   const handleStepClick = useCallback((index: number) => {
     const el = document.getElementById(`step-${PROCESS_STEPS[index].id}`);
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const OFFSET = 160; // navbar 64px + pipeline strip ~90px + 6px breathing room
+      const top = el.getBoundingClientRect().top + window.scrollY - OFFSET;
+      window.scrollTo({ top, behavior: 'smooth' });
     }
     setActiveStep(index);
   }, []);

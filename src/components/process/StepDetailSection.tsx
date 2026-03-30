@@ -1,9 +1,6 @@
-import { useRef, useState, useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
-import { OrbitControls } from '@react-three/drei';
 import { type ProcessStep } from '../../data/processSteps';
-import { StepIcon3D } from './StepIcon3D';
 
 interface StepDetailSectionProps {
   step: ProcessStep;
@@ -12,24 +9,6 @@ interface StepDetailSectionProps {
 
 export function StepDetailSection({ step, isVisible }: StepDetailSectionProps) {
   const ref = useRef<HTMLDivElement>(null);
-  // Only mount the Canvas when near viewport — avoids wasting WebGL contexts
-  const [canvasReady, setCanvasReady] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setCanvasReady(true);
-          obs.disconnect(); // only need to trigger once — stays mounted after
-        }
-      },
-      { rootMargin: '200px' } // start loading 200px before entering viewport
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
 
   return (
     <motion.div
@@ -43,7 +22,7 @@ export function StepDetailSection({ step, isVisible }: StepDetailSectionProps) {
     >
       <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-        {/* Left: 3D visualization — only mounted when near viewport */}
+        {/* Left: Step image */}
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           animate={isVisible ? { opacity: 1, x: 0 } : {}}
@@ -51,49 +30,46 @@ export function StepDetailSection({ step, isVisible }: StepDetailSectionProps) {
           className="relative"
         >
           <div
-            className="relative w-full aspect-square max-w-md mx-auto rounded-2xl overflow-hidden"
+            className="relative w-full max-w-md mx-auto rounded-2xl overflow-hidden group"
             style={{
-              background: `radial-gradient(ellipse at 40% 40%, ${step.color}18 0%, rgba(10,10,20,0.95) 70%)`,
-              border: `1px solid ${step.color}33`,
-              boxShadow: `0 0 60px ${step.color}20, inset 0 0 40px rgba(0,0,0,0.5)`,
+              aspectRatio: '4/3',
+              background: `radial-gradient(ellipse at center, ${step.color}12 0%, #080810 70%)`,
+              border: `1px solid ${step.color}55`,
+              boxShadow: `0 0 60px ${step.color}30, inset 0 0 40px rgba(0,0,0,0.5)`,
             }}
           >
-            {canvasReady ? (
-              <Canvas
-                camera={{ position: [0, 0.8, 2.8], fov: 45 }}
-                gl={{ antialias: true, alpha: true }}
-              >
-                <ambientLight intensity={0.4} />
-                <pointLight position={[3, 3, 3]} color={step.color} intensity={6} />
-                <pointLight position={[-2, -1, 2]} color={step.secondaryColor} intensity={4} />
-                <group scale={2.2}>
-                  <StepIcon3D
-                    color={step.color}
-                    secondaryColor={step.secondaryColor}
-                    stepIndex={step.index}
-                    active={true}
-                  />
-                </group>
-                <OrbitControls
-                  enableZoom={false}
-                  enablePan={false}
-                  autoRotate
-                  autoRotateSpeed={2}
-                />
-              </Canvas>
-            ) : (
-              /* Placeholder while canvas hasn't loaded yet */
-              <div className="w-full h-full flex items-center justify-center">
-                <div
-                  className="w-16 h-16 rounded-full animate-pulse"
-                  style={{ background: `${step.color}30`, border: `2px solid ${step.color}50` }}
-                />
-              </div>
-            )}
+            {/* Step image */}
+            <img
+              src={`${import.meta.env.BASE_URL}${step.index + 1}.png`}
+              alt={step.name}
+              className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105"
+              style={{ display: 'block', padding: '8px' }}
+            />
+
+            {/* Colour-tinted overlay for visual consistency */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                background: `linear-gradient(135deg, ${step.color}15 0%, transparent 50%, ${step.secondaryColor}10 100%)`,
+              }}
+            />
 
             {/* Corner decorations */}
             <div className="absolute top-4 left-4 w-8 h-8" style={{ borderTop: `2px solid ${step.color}80`, borderLeft: `2px solid ${step.color}80` }} />
             <div className="absolute bottom-4 right-4 w-8 h-8" style={{ borderBottom: `2px solid ${step.color}80`, borderRight: `2px solid ${step.color}80` }} />
+
+            {/* Bottom label bar */}
+            <div
+              className="absolute bottom-0 left-0 right-0 px-5 py-3 flex items-center gap-2"
+              style={{
+                background: `linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%)`,
+              }}
+            >
+              <span className="text-xs font-mono tracking-widest uppercase" style={{ color: step.color }}>
+                Step {step.index + 1}
+              </span>
+              <span className="text-xs text-gray-400">— {step.shortName}</span>
+            </div>
           </div>
 
           {/* Background step number */}
