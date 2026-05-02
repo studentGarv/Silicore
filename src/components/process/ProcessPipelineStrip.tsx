@@ -88,7 +88,7 @@ function CSSStepIcon({ step, active, hovered }: { step: ProcessStep; active: boo
 
 function ConnectorLine({ active }: { active: boolean }) {
   return (
-    <div className="flex-1 flex items-center px-1" style={{ minWidth: 0, marginBottom: 28 }}>
+    <div className="hidden md:flex flex-1 items-center px-1" style={{ minWidth: 0, marginBottom: 28 }}>
       <div
         className="h-px w-full transition-all duration-500"
         style={{
@@ -178,9 +178,9 @@ export function ProcessPipelineStrip({ activeStep, onStepClick }: ProcessPipelin
         backdropFilter: 'blur(20px)',
       }}
     >
-      <div className="max-w-6xl mx-auto flex items-end">
+      <div className="max-w-6xl mx-auto grid grid-cols-2 gap-y-6 md:flex md:items-end">
         {PROCESS_STEPS.map((step, idx) => (
-          <div key={step.id} className="flex items-end flex-1" style={{ minWidth: 0 }}>
+          <div key={step.id} className="flex items-end justify-center md:justify-start md:flex-1" style={{ minWidth: 0 }}>
             <StepCard
               step={step}
               active={activeStep === idx}

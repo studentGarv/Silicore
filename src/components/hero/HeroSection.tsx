@@ -8,6 +8,14 @@ import { ScrollIndicator } from '../ui/ScrollIndicator';
 export function HeroSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -26,7 +34,7 @@ export function HeroSection() {
     <section
       id="hero"
       ref={sectionRef}
-      className="relative h-screen w-full overflow-hidden"
+      className="hidden md:block relative h-screen w-full overflow-hidden"
       style={{
         background: 'radial-gradient(ellipse at 70% 40%, #0e0e22 0%, #0a0a0f 55%, #06060c 100%)',
       }}
@@ -45,7 +53,7 @@ export function HeroSection() {
           <pointLight position={[-4, -2, 2]} color="#b000ff" intensity={5} />
           <pointLight position={[0, 6, -2]} color="#ffffff" intensity={1} />
           <group position={[1.8, 0, 0]}>
-            <WaferModel3D scrollProgress={scrollProgress} />
+            {!isMobile && <WaferModel3D scrollProgress={scrollProgress} />}
             <ParticleSystem />
           </group>
         </Canvas>
@@ -53,7 +61,7 @@ export function HeroSection() {
 
       {/* Left-aligned text content */}
       <motion.div
-        className="relative z-10 h-full flex flex-col justify-center px-8 md:px-16 lg:px-24 max-w-2xl"
+        className="relative z-10 h-full flex flex-col justify-center -mt-24 md:mt-0 px-8 md:px-16 lg:px-24 max-w-2xl"
         style={{ y: textY, opacity: textOpacity }}
       >
         {/* Subtitle tag */}
@@ -94,6 +102,7 @@ export function HeroSection() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.65 }}
+          className="hidden md:block"
         >
           <ExploreButton />
         </motion.div>
@@ -101,7 +110,7 @@ export function HeroSection() {
 
       {/* Scroll indicator */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 hidden md:block"
         style={{ opacity: textOpacity }}
       >
         <ScrollIndicator />

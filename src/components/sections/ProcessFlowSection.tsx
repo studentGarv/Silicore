@@ -86,7 +86,7 @@ export function ProcessFlowSection() {
 
       {/* Sticky pipeline strip */}
       <div
-        className="sticky top-16 z-30"
+        className="relative md:sticky md:top-16 z-30"
         style={{ boxShadow: '0 4px 24px rgba(0,0,0,0.5)' }}
       >
         <ProcessPipelineStrip
