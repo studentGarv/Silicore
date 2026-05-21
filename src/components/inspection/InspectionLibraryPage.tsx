@@ -7,6 +7,7 @@ import {
 import { PROCESS_STEPS } from '../../data/processSteps';
 import { InspectionTechCard } from './InspectionTechCard';
 import { Breadcrumb } from '../ui/Breadcrumb';
+import { ProcessPipelineStrip } from '../process/ProcessPipelineStrip';
 
 interface InspectionLibraryPageProps {
   onGoHome: () => void;
@@ -20,6 +21,19 @@ export function InspectionLibraryPage({ onGoHome }: InspectionLibraryPageProps) 
   const [activeFilter, setActiveFilter] = useState<FilterTab>('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeStepFilter, setActiveStepFilter] = useState<string>('');
+
+  const activeStepIndex = useMemo(() => {
+    return activeStepFilter ? PROCESS_STEPS.findIndex((s) => s.id === activeStepFilter) : -1;
+  }, [activeStepFilter]);
+
+  const handleStepClick = (idx: number) => {
+    const step = PROCESS_STEPS[idx];
+    if (activeStepFilter === step.id) {
+      setActiveStepFilter('');
+    } else {
+      setActiveStepFilter(step.id);
+    }
+  };
 
   const breadcrumbs = [
     { label: 'Home', onClick: onGoHome },
@@ -127,6 +141,14 @@ export function InspectionLibraryPage({ onGoHome }: InspectionLibraryPageProps) 
         </div>
       </div>
 
+      {/* ── Visual Process Timeline Strip ── */}
+      <div className="hidden md:block">
+        <ProcessPipelineStrip
+          activeStep={activeStepIndex}
+          onStepClick={handleStepClick}
+        />
+      </div>
+
       {/* ── Filter & Search Bar ── */}
       <div
         className="sticky top-16 z-20 px-6 md:px-16 py-4"
@@ -147,11 +169,10 @@ export function InspectionLibraryPage({ onGoHome }: InspectionLibraryPageProps) 
               placeholder="Search by name, technique, or step…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm text-white placeholder-gray-600 outline-none focus:ring-1"
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm text-white placeholder-gray-600 outline-none focus:ring-1 focus:ring-[#00f0ff]"
               style={{
                 background: 'rgba(30,30,44,0.8)',
                 border: '1px solid rgba(255,255,255,0.1)',
-                focusRingColor: '#00f0ff',
               }}
             />
             {searchQuery && (
