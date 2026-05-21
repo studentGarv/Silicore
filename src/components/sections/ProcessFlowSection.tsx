@@ -4,6 +4,11 @@ import { ProcessPipelineStrip } from '../process/ProcessPipelineStrip';
 import { StepDetailSection } from '../process/StepDetailSection';
 
 
+interface ProcessFlowSectionProps {
+  /** Called when user clicks "Explore Inspection Methods" on any step */
+  onInspectClick?: (stepId: string) => void;
+}
+
 /**
  * Main Process Flow section — contains:
  *  1. A sticky horizontal pipeline strip showing all 8 steps
@@ -12,7 +17,7 @@ import { StepDetailSection } from '../process/StepDetailSection';
  * Clicking a step in the strip scrolls to that step's detail section.
  * Scrolling through sections updates the active step in the strip.
  */
-export function ProcessFlowSection() {
+export function ProcessFlowSection({ onInspectClick }: ProcessFlowSectionProps) {
   const [activeStep, setActiveStep] = useState(0);
   const [visibleStep, setVisibleStep] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -79,8 +84,8 @@ export function ProcessFlowSection() {
           </span>
         </h2>
         <p className="text-gray-400 max-w-xl mx-auto text-sm">
-          Click any step below to dive into the details. Scroll through each stage to explore
-          how raw silicon becomes a finished microchip.
+          Click any step below to dive into the details. Each step includes dedicated inspection methods —
+          click "Explore Inspection Methods" to see the full inspection tree.
         </p>
       </div>
 
@@ -101,6 +106,7 @@ export function ProcessFlowSection() {
           key={step.id}
           step={step}
           isVisible={visibleStep === idx}
+          onInspectClick={onInspectClick}
         />
       ))}
     </div>

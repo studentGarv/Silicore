@@ -1,14 +1,18 @@
 import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { type ProcessStep } from '../../data/processSteps';
+import { getInspectionForStep } from '../../data/inspectionData';
 
 interface StepDetailSectionProps {
   step: ProcessStep;
   isVisible: boolean;
+  /** Called when user clicks "Explore Inspection Methods" */
+  onInspectClick?: (stepId: string) => void;
 }
 
-export function StepDetailSection({ step, isVisible }: StepDetailSectionProps) {
+export function StepDetailSection({ step, isVisible, onInspectClick }: StepDetailSectionProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const techCount = getInspectionForStep(step.id).length;
 
   return (
     <motion.div
@@ -118,9 +122,40 @@ export function StepDetailSection({ step, isVisible }: StepDetailSectionProps) {
             ))}
           </div>
 
-          <div className="mt-10 flex items-center gap-4">
+          <div className="mt-10 flex items-center gap-4 flex-wrap">
+            {onInspectClick && (
+              <motion.button
+                initial={{ opacity: 0, y: 8 }}
+                animate={isVisible ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.5, delay: 0.5 }}
+                onClick={() => onInspectClick(step.id)}
+                className="group flex items-center gap-3 px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300"
+                style={{
+                  background: `${step.color}18`,
+                  border: `1px solid ${step.color}55`,
+                  color: step.color,
+                }}
+                onMouseEnter={(e) => {
+                  const el = e.currentTarget;
+                  el.style.background = `${step.color}30`;
+                  el.style.boxShadow = `0 0 24px ${step.color}40`;
+                }}
+                onMouseLeave={(e) => {
+                  const el = e.currentTarget;
+                  el.style.background = `${step.color}18`;
+                  el.style.boxShadow = 'none';
+                }}
+              >
+                <span>Explore Inspection Methods</span>
+                <span
+                  className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs transition-transform duration-200 group-hover:translate-x-0.5"
+                  style={{ background: `${step.color}25` }}
+                >
+                  {techCount > 0 ? techCount : '→'}
+                </span>
+              </motion.button>
+            )}
             <div className="h-px flex-1" style={{ background: `linear-gradient(to right, ${step.color}40, transparent)` }} />
-            <span className="text-xs text-gray-500 font-mono tracking-wider">SCROLL TO CONTINUE</span>
           </div>
         </motion.div>
 
